@@ -11,8 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib     import Path
-from my_settings import DATABASES, SECRET_KEY, ALGORITHM
-
+from configs.config import config
 # import pymysql
 
 # pymysql.install_as_MySQLdb()
@@ -25,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECRET_KEY
 
-ALGORITHM  = ALGORITHM
+SECRET_KEY = config.secrets["django"]
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -88,7 +87,16 @@ WSGI_APPLICATION = 'terarosa.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = DATABASES
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": config.databases["database"],
+        "USER": config.databases["username"],
+        "PASSWORD": config.databases["password"],
+        "PORT": config.databases["port"],
+        "OPTIONS": {"charset": "utf8mb4"},
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -157,3 +165,8 @@ CORS_ALLOW_HEADERS = (
 )
 
 APPEND_SLASH = False
+
+# JWT SECRET
+JWT_KEY = config.token["scret"]
+JWT_EXPIRE_TIME = config.token["expire_sec"]
+JWT_REFRESH_EXPIRE_TIME = config.token["refresh_expire_sec"]
