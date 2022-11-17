@@ -1,13 +1,25 @@
 from itertools import count
 import json
-
 from django.http           import JsonResponse
 from django.views          import View
 from django.db.models      import Q
-
 from products.models       import Product, ProductImage, TasteByProduct, Grainding, Size
-
 from urllib.parse          import unquote
+
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework import status
+from rest_framework.parsers import JSONParser
+from decorators.execption_handler import execption_hanlder
+from django.http import JsonResponse
+from products.service import ProductService
+
+product_service = ProductService()
+
+@execption_hanlder()
+@api_view(["GET"])
+@parser_classes([JSONParser])
+def get_main_view(request, *args, **kwargs):
+    return JsonResponse(product_service.get_product_mainpage(), status=status.HTTP_200_OK)
 
 
 class MainProductView(View):
