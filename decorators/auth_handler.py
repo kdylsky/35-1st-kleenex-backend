@@ -5,7 +5,7 @@ from users.utils.utils import author_provider
 from users.exceptions import NotFoundError 
 from exceptions import NotAuthorizedError
 
-def login_decorator():
+def login_decorators():
     def decorator(api_func):
         @wraps(api_func)
         def wrapper(request, *args, **kwargs):
