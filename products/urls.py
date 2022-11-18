@@ -1,10 +1,10 @@
 from django.urls import path
 
-from products.views import MainProductView, CoffeeProductView, ProductDetailView, MainSearchView
+from products.views import get_main_view, get_list_view, get_detail_view, get_serarch_view
 
 urlpatterns = [
-    path('/main', MainProductView.as_view()),
-    path('', CoffeeProductView.as_view()),
-    path('/main/search', MainSearchView.as_view()),
-    path('/<int:product_id>', ProductDetailView.as_view()),
+    path("/main", get_main_view),
+    path("/coffee_list", get_list_view),
+    path("/coffee/<int:product_id>", get_detail_view),
+    path("/search", get_serarch_view)
 ]
