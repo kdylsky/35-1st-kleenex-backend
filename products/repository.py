@@ -1,9 +1,13 @@
-from products.models import Product, ProductImage, Taste, TasteByProduct, SubCategory, Category
-from products.serializers import ProductModelSerializer, SubCategoryModelSerializer, TestProductModelSerializer,TestCategoryModelSerializer
+from products.models import Product
+from products.serializers import ProductModelSerializer, ProductDetailSerializer
 from django.db.models import Q
+
 class ProductRepo:
+    def __init__(self):
+        self.model = Product
+
     def get(self, sort_field):
-        product = Product.objects.all().order_by(f"-{sort_field}")[:3]
+        product = self.model.objects.all().order_by(f"-{sort_field}")[:3]
         serializer = ProductModelSerializer(product, many=True)
         return serializer.data
     
@@ -19,7 +23,12 @@ class ProductRepo:
         'roast'     : '-roasting_date',
         None        : 'id'
         }
-        total = Product.objects.all().count()
-        products = Product.objects.filter(q).order_by(sort_dict.get(sorting)).distinct()[offset:offset+limit]
+        total = self.model.objects.all().count()
+        products = self.model.objects.filter(q).order_by(sort_dict.get(sorting)).distinct()[offset:offset+limit]
         serializer = ProductModelSerializer(products, many=True)
         return total, serializer.data
+    
+    def get_detail(self, product_id):
+        product = self.model.objects.get(id=product_id)
+        serailizer = ProductDetailSerializer(product)
+        return serailizer.data

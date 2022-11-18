@@ -11,8 +11,15 @@ class ProductService:
     
     def get_coffee_list(self, category, tastes,sorting, offset, limit):
         total,product = self.product_repo.get_list(category, tastes,sorting, offset, limit)
-        result ={
+        data ={
             'total'             : total,
             'shop_product_list' : product
             }
-        return result 
+        return data 
+    
+    def get_detail(self, product_id):
+        data = self.product_repo.get_detail(product_id = product_id) 
+        return data
+    
+    def get_search(self, search):
+        pass

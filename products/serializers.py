@@ -1,9 +1,7 @@
 from rest_framework import serializers
-from products.models import Product, ProductImage, Taste, TasteByProduct, Category, SubCategory
+from products.models import Product, ProductImage, Taste, TasteByProduct, Category, SubCategory, Size, Grainding
 
 ## 중첩 serializer 1:N관계에서 1에 해당하는 시리얼 라이즈
-
-
 class TasteModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Taste
@@ -20,6 +18,33 @@ class ProductModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "id","name", "eng_name", "roasting_date", "price",  "productimage_set", "taste_set"
+
+class SizeModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = "id","name","price"
+
+class GraindingModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grainding
+        fields = "id", "type"
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    productimage_set= ProductImageModelSerializer(many=True, read_only=True)
+    taste_set =  TasteModelSerializer(many=True, read_only = True)
+    size_set = SizeModelSerializer(many=True, read_only = True)
+    grainding_set = GraindingModelSerializer(many=True, read_only = True)
+    
+    class Meta:
+        model = Product
+        fields = "id","name", "eng_name", "roasting_date", "price",  "productimage_set", "taste_set", "grainding_set", "size_set"
+
+
+
+
+
+
+
 
 
 
