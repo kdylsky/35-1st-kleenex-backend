@@ -29,4 +29,11 @@ class CartService:
         cart_obj.quantity = quantity
         cart_obj.save()
         return True
+
+    def delete_cart(self, user: object, cart_id: int):
+        cart_obj = self.repo.find(
+            user=user,
+            cart_id=cart_id
+        )
+        return cart_obj.delete()
         

@@ -1,8 +1,8 @@
-from carts.models import Cart
-from products.models import Product
-from carts.serializers import CartModelSerializer
-from django.db import transaction
-from carts.exceptions import NotFoundError, CanNotNegative
+from django.db          import transaction
+
+from carts.models       import Cart
+from carts.exceptions   import NotFoundError
+from products.models    import Product
 
 class CartRepo:
     def __init__(self):
@@ -22,6 +22,7 @@ class CartRepo:
                 quantity = product["quantity"]
                 graind   = target_product.graindbyproduct_set.get(grainding_id=product["graind"]).grainding
                 size     = target_product.size_set.get(name=product["size"])
+                
                 cart, is_bool = self.model.objects.get_or_create(
                     user      = user,
                     product   = target_product,
