@@ -1,6 +1,7 @@
 from products.models import Product
 from products.serializers import ProductModelSerializer, ProductDetailSerializer
 from django.db.models import Q
+from urllib.parse          import unquote
 
 class ProductRepo:
     def __init__(self):
@@ -32,3 +33,8 @@ class ProductRepo:
         product = self.model.objects.get(id=product_id)
         serailizer = ProductDetailSerializer(product)
         return serailizer.data
+
+    def get_search(self, search):
+        products = Product.objects.filter(name__icontains=unquote(search))
+        serializer = ProductModelSerializer(products, many=True)
+        return serializer.data

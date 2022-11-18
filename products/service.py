@@ -22,4 +22,5 @@ class ProductService:
         return data
     
     def get_search(self, search):
-        pass
+        data = self.product_repo.get_search(search)
+        return data
