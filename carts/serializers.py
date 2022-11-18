@@ -21,3 +21,12 @@ class CartModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = "id", "product_id", "user", "product","size", "graind", "quantity", "price", "image"
+
+class CartDeatilRequest(serializers.Serializer):
+    size = serializers.CharField(max_length=10)
+    graind = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+
+class CartRequet(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    products = CartDeatilRequest(many=True)

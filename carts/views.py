@@ -17,7 +17,7 @@ from decorators.execption_handler import execption_hanlder
 from django.http import JsonResponse
 
 from carts.service import CartService
-
+from carts.serializers import CartRequet
 
 cart_service = CartService()
 
@@ -25,63 +25,28 @@ class CartAPIView(APIView):
     def get(self, request, *args, **kwargs):
         return get_cart_list(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        return create_cart(request, *args, **kwargs)
+
 @execption_hanlder()
 @parser_classes([JSONParser])
 @login_decorators()
-def get_cart_list(request, *args, **kwargs):
+def get_cart_list(request, *args, **kwargs)-> dict:
     user = request.user
     return JsonResponse(cart_service.get_list(user), status=status.HTTP_200_OK, safe=False)
 
+@execption_hanlder()
+@parser_classes([JSONParser])
+@login_decorators()
+def create_cart(request, *args, **kwargs)-> bool:
+    user = request.user
+    data = request.data
+    params = CartRequet(data=data)
+    params.is_valid(raise_exception=True)
+    return JsonResponse(cart_service.create_cart(user, **params.data), status=status.HTTP_201_CREATED, safe=False)
 
 
 class CartView(View):
-    @login_decorator
-    @transaction.atomic()
-    def post(self, request):
-        try:
-            datas           = json.loads(request.body)
-            user            = request.user
-            product_id      = datas["product_id"]
-            products        = datas["product"]
-            target_product  = Product.objects.get(id = product_id)
-            
-            for product in products:
-                quantity    = product["quantity"]
-                graind      = target_product.graindbyproduct_set.get(grainding_id = product["graind"]).grainding
-                size        = target_product.size_set.get(name = product["size"])
-
-                cart, is_bool   = Cart.objects.get_or_create(
-                    user        = user,
-                    product     = target_product,
-                    graind      = graind,
-                    size        = size,
-                    defaults    = {'quantity': quantity}
-                )
-
-                if not is_bool :
-                    cart.quantity += quantity
-                    cart.save()
-
-            return JsonResponse({"MESSAGE": "TEST"}, status=200)
-
-        except KeyError:
-            return JsonResponse({"MESSAGE": "KEYERROR"}, status=400)
-
-        except Size.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_SIZE"}, status=400)
-
-        except Product.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_PRODUCT"}, status=400)
-
-        except Grainding.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_GRAINDING"}, status=400)
-
-        except json.JSONDecodeError:
-            return JsonResponse
-
-        except GraindByProduct.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_GRAINDING"}, status=400)
-
     @login_decorator
     def patch(self,request):
         try:
