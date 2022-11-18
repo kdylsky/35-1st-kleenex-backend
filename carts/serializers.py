@@ -27,6 +27,12 @@ class CartDeatilRequest(serializers.Serializer):
     graind = serializers.IntegerField()
     quantity = serializers.IntegerField()
 
+
 class CartRequet(serializers.Serializer):
     product_id = serializers.IntegerField()
     products = CartDeatilRequest(many=True)
+
+
+class CartPatchSchema(serializers.Serializer):
+    cart_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()

@@ -17,7 +17,7 @@ from decorators.execption_handler import execption_hanlder
 from django.http import JsonResponse
 
 from carts.service import CartService
-from carts.serializers import CartRequet
+from carts.serializers import CartRequet, CartPatchSchema
 
 cart_service = CartService()
 
@@ -27,6 +27,9 @@ class CartAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         return create_cart(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return patch_cart(request, *args, **kwargs)
 
 @execption_hanlder()
 @parser_classes([JSONParser])
@@ -45,6 +48,17 @@ def create_cart(request, *args, **kwargs)-> bool:
     params.is_valid(raise_exception=True)
     return JsonResponse(cart_service.create_cart(user, **params.data), status=status.HTTP_201_CREATED, safe=False)
 
+
+@execption_hanlder()
+@parser_classes([JSONParser])
+@login_decorators()
+def patch_cart(request, *args, **kwargs):
+    user = request.user
+    data = request.data
+    params = CartPatchSchema(data=data)
+    params.is_valid(raise_exception=True)
+    return JsonResponse(cart_service.patch_cart(user, **params.data), status=status.HTTP_201_CREATED, safe=False)
+    
 
 class CartView(View):
     @login_decorator
