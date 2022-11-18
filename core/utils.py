@@ -38,12 +38,14 @@ def duplicate_check_phone_number(phone_number):
     if User.objects.filter(phone_number = phone_number).exists():
         raise ValueError("INVAILD_PHONE_NUMBER")
 
+from users.utils.utils import author_provider
+
 def login_decorator(func):
     def wrapper(self, request, *args, **kwargs):
         try:
             access_token = request.headers.get('Authorization')
-            payload      = jwt.decode(access_token, settings.SECRET_KEY, settings.ALGORITHM)
-            user         = User.objects.get(id = payload['id'])
+            payload      = jwt.decode(access_token, author_provider.key, algorithms=["HS256"])
+            user         = User.objects.get(id = payload['user_id'])
             request.user = user
 
             return func(self, request, *args, **kwargs)
