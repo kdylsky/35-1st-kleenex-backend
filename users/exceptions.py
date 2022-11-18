@@ -1,5 +1,6 @@
 from rest_framework import status
-from exceptions import CustomBaseExecption
+
+from exceptions     import CustomBaseExecption
 
 class SignupRaiseError(CustomBaseExecption):
     def __init__(self, msg):
