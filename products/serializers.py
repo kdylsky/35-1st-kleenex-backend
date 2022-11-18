@@ -3,16 +3,26 @@ from products.models import Product, ProductImage, Taste, TasteByProduct, Catego
 
 ## 중첩 serializer 1:N관계에서 1에 해당하는 시리얼 라이즈
 
+
+class TasteModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Taste
+        fields = "id", "name"
+
 class ProductImageModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = "url", 
+        fields = "id","url" 
 
 class ProductModelSerializer(serializers.ModelSerializer):
     productimage_set= ProductImageModelSerializer(many=True, read_only=True)
+    taste_set =  TasteModelSerializer(many=True, read_only = True)
     class Meta:
         model = Product
-        fields = "name", "eng_name", "roasting_date", "price", "subcategory", "productimage_set"
+        fields = "id","name", "eng_name", "roasting_date", "price",  "productimage_set", "taste_set"
+
+
+
 
 
 class CategoryModelSerializer(serializers.ModelSerializer):
