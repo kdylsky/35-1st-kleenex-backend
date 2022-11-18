@@ -2,7 +2,7 @@ from django.db import models
 
 from products.models import Product, Size, Grainding
 from users.models    import User
-from core.models     import TimeStampModel
+from terarosa.models import TimeStampModel
 
 class Order(TimeStampModel): 
     order_number = models.CharField(max_length = 250)

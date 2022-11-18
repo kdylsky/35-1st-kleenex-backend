@@ -1,6 +1,6 @@
 from django.db   import models
 
-from core.models import TimeStampModel
+from terarosa.models import TimeStampModel
 
 class User(TimeStampModel):
     name         = models.CharField(max_length = 50)

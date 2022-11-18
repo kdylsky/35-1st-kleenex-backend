@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'carts',
-    'core',
     "drf_yasg",
     'rest_framework',
 ]
