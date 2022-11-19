@@ -177,7 +177,6 @@
 <br>
 <br>
 <br>
-
     - 해결방법
         - `nest serializer`를 활용해서 product serializer에 옵션들의 model serializer를 포함 시켜 주었습니다.
         - 필드에 대해서는 역참조를 이용해서 예를 들어 fields에 `size_set`, `productimage_set`으로 참조해서 serializer를 활용했습니다.
@@ -188,17 +187,14 @@
         - 메인페이지의 가격과 신선도에 해당하는 상품을출력 
             - `get(필드명)`함수를 정의해서 상품에 대해서 내림차순으로 3개의 상품을 출력하는 함수를 구현
             - 가격과 신선도 이외에 다른 필드를 입력시 해당 필드에 대해서도 출력 가능  
-<br>    
         - 전체 상품리스트 출력
             - django의 `Q`를 활용해서 조건이 있을 경우 조건들을 하나로 통합
             - `distinct()`로 중복되 쿼리셋 제거
             - `offset` 과 `limit` 를 활용해서 pagination을 구현했습니다. 
             - `ProductModelSerializer`를 정의해서 `many=True` 옵션으로 해당 product쿼리셋을 dict형태로 반환
-<br><br>    
         - 특정 상품 출력
             - `path 파라미터`로 상품의 아이디를 받아서 상품을 특정함
-            - `ProductDetailSerializer`로 해당 상품을 dict로 반환
-<br><br>    
+            - `ProductDetailSerializer`로 해당 상품을 dict로 반환  
         - 상품 검색
             - `쿼리 파라미터`로 search를 받아 search가 포함된 상품을 반환
         
@@ -211,27 +207,21 @@
     - 어려웠던점
         - 장바구니 객체를 출력하는 경우, 기존에 정의된 상품에 대한 옵션을 가지고 와야한다는 점에서 어떻게 접근해야하는지가 고민되었습니다.
 <br>
-
     - 해결
-        - 리스트 출력시 serializer에 `source` 옵션을 활용해서 해당 장바구니에 담긴 상품의 옵션을 참조해서 출력할 수 있었습니다.
-<br>    
+        - 리스트 출력시 serializer에 `source` 옵션을 활용해서 해당 장바구니에 담긴 상품의 옵션을 참조해서 출력할 수 있었습니다.   
 <br>    
     - 설명
         - 장바구니 생성
             - 하나의 상품에 옵션별로 다른 장바구니 객체가 생성되기 때문에, 입력받는 데이터가 리스트가 되어 for문을 통해서 하나씩 꺼내어 장바구니 객체 생성
-            - `get_or_create`를 활용, 기존에 장바구니에 생성된 상품이 있다면, 해당 상품의 개수를 증가시키는 식으로 구현
-<br>     
+            - `get_or_create`를 활용, 기존에 장바구니에 생성된 상품이 있다면, 해당 상품의 개수를 증가시키는 식으로 구현     
         - 장바구니 리스트 출력
             - serializer의 `source` 옵션을 활용해서 외래키로 연결된 데이터에 접근해서 값을 출력함
             - 다른 옵션의 경우 `정참조`로 가능하나, 상품의 image에 대해서는 `nest serializer`와 `source`를 모두 활용해서 `역참조`로 데이터 출력
-<br>
         - 장바구니 수정
             - 장바구니 상품 수량을 수정
             - `음수`로 변경하려는 경우 `CanNotNegative()` 에러 처리 
-<br>
         - 장바구니 삭제
             - `path 파라미터`를 활용해서 장바구니 객체를 특정 후 삭제
-
 <br>
 <br>
 <br>
@@ -249,6 +239,9 @@ URL|Method|Description|
 |"/user/signup"|POST|회원가입|
 |"/user/login"|POST|로그인|
 
+<br>
+<br>
+<br>
 
 ### products
 
@@ -261,6 +254,9 @@ URL|Method|Description|
 
 - 상품리스트 출력의 경우 sort, category, taste, limit, offset을 쿼리 파라미터로 정할 수 있다.
 
+<br>
+<br>
+<br>
 
 ### carts
 
