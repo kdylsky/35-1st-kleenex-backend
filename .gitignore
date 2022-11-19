@@ -404,3 +404,6 @@ my_settings.py
 upload.py
 csv_file
 decorators.py
+
+*_real.yml
+.idea

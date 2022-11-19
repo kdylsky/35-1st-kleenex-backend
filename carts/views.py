@@ -1,120 +1,61 @@
-import json
+from django.http                import JsonResponse
 
-from django.db import transaction
-from django.http import JsonResponse
-from django.views import View
+from rest_framework             import status
+from rest_framework.views       import APIView
+from rest_framework.parsers     import JSONParser
+from rest_framework.decorators  import parser_classes
 
-from carts.models import Cart
-from products.models import *
-from core.utils import login_decorator
+from carts.service                import CartService
+from carts.serializers            import CartRequetSchema, CartPatchSchema
+from decorators.auth_handler      import login_decorators
+from decorators.execption_handler import execption_hanlder
 
-class CartView(View):
-    @login_decorator
-    def get(self, request):
-        cart_list = Cart.objects.select_related('product','user','size','graind')\
-                                .prefetch_related('product__productimage_set')\
-                                .filter(user=request.user)
+cart_service = CartService()
 
-        result = [{
-            "cart_id"       : cart.id,
-            "id"            : cart.product.id,
-            "user"          : cart.user.name,
-            "product"       : cart.product.name,
-            "size"          : cart.size.name,
-            "price"         : cart.size.price,
-            "graind"        : cart.graind.type,
-            "quantity"      : cart.quantity,
-            "image"         : cart.product.productimage_set.all()[0].url,
-            "is_checked"    : False
-        } for cart in cart_list]
+class CartAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        return get_cart_list(request, *args, **kwargs)
 
-        return JsonResponse({'MESSAGE': result}, status=200)
+    def post(self, request, *args, **kwargs):
+        return create_cart(request, *args, **kwargs)
 
-    @login_decorator
-    @transaction.atomic()
-    def post(self, request):
-        try:
-            datas           = json.loads(request.body)
-            user            = request.user
-            product_id      = datas["product_id"]
-            products        = datas["product"]
-            target_product  = Product.objects.get(id = product_id)
-            
-            for product in products:
-                quantity    = product["quantity"]
-                graind      = target_product.graindbyproduct_set.get(grainding_id = product["graind"]).grainding
-                size        = target_product.size_set.get(name = product["size"])
+    def patch(self, request, *args, **kwargs):
+        return patch_cart(request, *args, **kwargs)
 
-                cart, is_bool   = Cart.objects.get_or_create(
-                    user        = user,
-                    product     = target_product,
-                    graind      = graind,
-                    size        = size,
-                    defaults    = {'quantity': quantity}
-                )
+    def delete(self, request, *args, **kwargs):
+        return delete_cart(request, *args, **kwargs)
 
-                if not is_bool :
-                    cart.quantity += quantity
-                    cart.save()
+@execption_hanlder()
+@parser_classes([JSONParser])
+@login_decorators()
+def get_cart_list(request, *args, **kwargs)-> dict:
+    user = request.user
+    return JsonResponse(cart_service.get_list(user), status=status.HTTP_200_OK, safe=False)
 
-            return JsonResponse({"MESSAGE": "TEST"}, status=200)
+@execption_hanlder()
+@parser_classes([JSONParser])
+@login_decorators()
+def create_cart(request, *args, **kwargs)-> bool:
+    user   = request.user
+    data   = request.data
+    params = CartRequetSchema(data=data)
+    params.is_valid(raise_exception=True)
+    return JsonResponse(cart_service.create_cart(user, **params.data), status=status.HTTP_201_CREATED, safe=False)
 
-        except KeyError:
-            return JsonResponse({"MESSAGE": "KEYERROR"}, status=400)
-
-        except Size.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_SIZE"}, status=400)
-
-        except Product.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_PRODUCT"}, status=400)
-
-        except Grainding.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_GRAINDING"}, status=400)
-
-        except json.JSONDecodeError:
-            return JsonResponse
-
-        except GraindByProduct.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_GRAINDING"}, status=400)
-
-    @login_decorator
-    def patch(self,request):
-        try:
-            data            = json.loads(request.body)
-            user            = request.user
-            cart            = Cart.objects.get(id=data["cart_id"], user=user)
-            quantity        = data["quantity"]
-
-            if quantity <= 0:
-                return JsonResponse({'MESSAGE' : f'INVALID VALUE : {quantity} '}, status=400)
-            
-            cart.quantity = quantity
-            cart.save()
-
-            return JsonResponse({"MESSAGE": "PATCH_SUCCESS"}, status=200)
-
-        except KeyError:
-            return JsonResponse({"MESSAGE":"KEY_ERROR"}, status=400)
-
-        except Cart.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_CART"}, status=400)
-
-    @login_decorator
-    def delete(self, request):
-        try:
-            datas = json.loads(request.body)
-            user = request.user 
-            if datas.get("is_bool"):
-                Cart.objects.filter(user=user).delete()
-
-            elif datas.get("cart_id"):
-                for data in datas["cart_id"]:
-                    Cart.objects.get(id=data, user=user).delete()
-
-            return JsonResponse({"MESSAGE": "DELETE_SUCCESS"}, status=200)
-
-        except KeyError:
-            return JsonResponse({"MESSAGE": "KEY_ERROR"}, status=400)
-
-        except Cart.DoesNotExist:
-            return JsonResponse({"MESSAGE": "DOESNOTEXIST_CART"}, status=400)
+@execption_hanlder()
+@parser_classes([JSONParser])
+@login_decorators()
+def patch_cart(request, *args, **kwargs):
+    user   = request.user
+    data   = request.data
+    params = CartPatchSchema(data=data)
+    params.is_valid(raise_exception=True)
+    return JsonResponse(cart_service.patch_cart(user, **params.data), status=status.HTTP_201_CREATED, safe=False)
+    
+@execption_hanlder()
+@parser_classes([JSONParser])
+@login_decorators()
+def delete_cart(request, *args, **kwargs):
+    user    = request.user
+    cart_id = kwargs["cart_id"]
+    return JsonResponse(cart_service.delete_cart(user, cart_id), status=status.HTTP_200_OK, safe=False)
