@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
     'products',
-    'orders',
     'carts',
     "drf_yasg",
     'rest_framework',
